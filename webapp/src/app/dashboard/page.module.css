@@ -229,3 +229,70 @@
   font-weight: 600;
   text-decoration: underline;
 }
+
+.logErrorBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.logErrorSummary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.logErrorTitle {
+  font-weight: 600;
+  color: var(--error);
+}
+
+.logErrorMessage {
+  color: #fca5a5;
+}
+
+.logDetailsBtn {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: var(--radius);
+  padding: 1px 6px;
+  font-size: 10px;
+  font-family: var(--mono);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.logDetailsBtn:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}
+
+.logRawError {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 120px;
+  overflow-y: auto;
+  margin-top: 4px;
+}
+
+.logToolFailBlock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.toolFailMsg {
+  color: #fca5a5;
+}
+

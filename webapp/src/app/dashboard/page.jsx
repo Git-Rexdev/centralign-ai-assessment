@@ -1,6 +1,9 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Nav from "@/components/Nav";
+import ErrorBanner from "@/components/ErrorBanner";
+import logger from "@/lib/frontendLogger";
+import { parseBackendError } from "@/lib/errorParser";
 import styles from "./page.module.css";
 
 const AGENT_URL = process.env.NEXT_PUBLIC_AGENT_URL || "http://localhost:8000";
@@ -12,6 +15,8 @@ const PRESET_TASKS = [
 ];
 
 function LogEntry({ entry }) {
+  const [showDetails, setShowDetails] = useState(false);
+
   const cls = {
     thinking: styles.logThinking,
     tool_call: styles.logTool,
@@ -26,7 +31,7 @@ function LogEntry({ entry }) {
   const renderContent = () => {
     switch (entry.type) {
       case "task_start":
-        return <span>Task started &mdash; {entry.data?.model}</span>;
+        return <span>Task started: {entry.data?.model} ({entry.data?.provider || "agent"})</span>;
       case "thinking":
         return <span>Thinking... (step {entry.data?.iteration})</span>;
       case "tool_call":
@@ -38,13 +43,37 @@ function LogEntry({ entry }) {
           </span>
         );
       case "tool_result": {
+        const isOk = entry.data?.success;
         const r = entry.data?.result;
+        if (!isOk) {
+          const errMsg =
+            r?.error || r?.message || (typeof r === "string" ? r : "Action could not be completed");
+          return (
+            <div className={styles.logToolFailBlock}>
+              <span className={styles.fail}>[FAIL]</span>
+              {" "}
+              <span className={styles.toolFailMsg}>
+                Tool execution failed: {String(errMsg).slice(0, 120)}
+              </span>
+              <button
+                type="button"
+                className={styles.logDetailsBtn}
+                onClick={() => setShowDetails((prev) => !prev)}
+              >
+                {showDetails ? "Hide Details" : "Details"}
+              </button>
+              {showDetails && (
+                <pre className={styles.logRawError}>
+                  {JSON.stringify(r, null, 2)}
+                </pre>
+              )}
+            </div>
+          );
+        }
         const preview = JSON.stringify(r)?.slice(0, 180);
         return (
           <span>
-            <span className={entry.data?.success ? styles.ok : styles.fail}>
-              {entry.data?.success ? "[OK]" : "[FAIL]"}
-            </span>
+            <span className={styles.ok}>[OK]</span>
             {"  "}
             {preview}
           </span>
@@ -52,12 +81,33 @@ function LogEntry({ entry }) {
       }
       case "agent_response":
         return <span className={styles.finalResponse}>{entry.data?.text}</span>;
-      case "error":
-        return <span>Error: {entry.data?.message}</span>;
+      case "error": {
+        const parsed = parseBackendError(entry.data?.raw || entry.data?.message || entry.data);
+        return (
+          <div className={styles.logErrorBlock}>
+            <div className={styles.logErrorSummary}>
+              <span className={styles.logErrorTitle}>{parsed.title}:</span>
+              <span className={styles.logErrorMessage}>{parsed.message}</span>
+              <button
+                type="button"
+                className={styles.logDetailsBtn}
+                onClick={() => setShowDetails((prev) => !prev)}
+              >
+                {showDetails ? "Hide Raw Error" : "View Raw Error"}
+              </button>
+            </div>
+            {showDetails && (
+              <pre className={styles.logRawError}>
+                {parsed.raw || JSON.stringify(entry.data, null, 2)}
+              </pre>
+            )}
+          </div>
+        );
+      }
       case "task_complete":
         return (
           <span>
-            {entry.data?.success ? "Task completed" : "Task failed"} &mdash;{" "}
+            {entry.data?.success ? "Task completed" : "Task failed"} -{" "}
             {entry.data?.iterations} step{entry.data?.iterations !== 1 ? "s" : ""}
           </span>
         );
@@ -82,8 +132,8 @@ export default function DashboardPage() {
   const [running, setRunning] = useState(false);
   const [log, setLog] = useState([]);
   const [status, setStatus] = useState("idle"); // idle | running | done | error
+  const [errorInfo, setErrorInfo] = useState(null);
   const logEndRef = useRef(null);
-  const esRef = useRef(null);
 
   useEffect(() => {
     logEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -91,9 +141,12 @@ export default function DashboardPage() {
 
   const runTask = async () => {
     if (!task.trim() || running) return;
+    setErrorInfo(null);
     setRunning(true);
     setStatus("running");
     setLog([]);
+
+    logger.info("Dashboard", "Starting task execution", { task });
 
     try {
       const res = await fetch(`${AGENT_URL}/api/run`, {
@@ -103,12 +156,24 @@ export default function DashboardPage() {
       });
 
       if (!res.ok) {
-        throw new Error(`Server error: ${res.status}`);
+        let errDetails = "";
+        try {
+          const errJson = await res.json();
+          errDetails = errJson.detail || errJson.error || JSON.stringify(errJson);
+        } catch {
+          errDetails = await res.text().catch(() => "");
+        }
+        const errorObj = {
+          status: res.status,
+          message: errDetails || `Server responded with status code ${res.status}`,
+        };
+        throw errorObj;
       }
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
+      let hasEncounteredError = false;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -124,29 +189,99 @@ export default function DashboardPage() {
           if (!raw) continue;
           try {
             const event = JSON.parse(raw);
+
+            if (event.type === "error") {
+              hasEncounteredError = true;
+              const parsed = parseBackendError(event.data?.message || event.data);
+              setErrorInfo(parsed);
+              setStatus("error");
+              logger.error("AgentAPI", parsed.message, {
+                category: parsed.category,
+                action: parsed.action,
+                raw: parsed.raw,
+                statusCode: parsed.statusCode,
+                url: `${AGENT_URL}/api/run`,
+              });
+              setLog((prev) => [
+                ...prev,
+                {
+                  ...event,
+                  data: {
+                    ...event.data,
+                    message: parsed.message,
+                    raw: parsed.raw,
+                    title: parsed.title,
+                  },
+                },
+              ]);
+              continue;
+            }
+
+            if (event.type === "task_complete" && !event.data?.success) {
+              hasEncounteredError = true;
+              setStatus("error");
+              const parsed = parseBackendError(
+                event.data?.summary || "Agent task did not complete successfully"
+              );
+              setErrorInfo((current) => current || parsed);
+              logger.error("AgentAPI", "Task failed to complete", {
+                category: parsed.category,
+                summary: event.data?.summary,
+                iterations: event.data?.iterations,
+              });
+            }
+
             if (event.type === "done") {
-              setStatus("done");
+              if (!hasEncounteredError) {
+                setStatus("done");
+                logger.info("Dashboard", "Task completed successfully");
+              }
               break;
             }
+
             setLog((prev) => [...prev, event]);
-          } catch {}
+          } catch (parseErr) {
+            logger.warn("Dashboard", "Failed to parse SSE line", { raw, parseErr: String(parseErr) });
+          }
         }
       }
     } catch (err) {
+      const parsed = parseBackendError(err);
+      setErrorInfo(parsed);
+      setStatus("error");
+
+      logger.error("Dashboard", parsed.message, {
+        category: parsed.category,
+        action: parsed.action,
+        raw: parsed.raw,
+        statusCode: parsed.statusCode,
+        url: `${AGENT_URL}/api/run`,
+      });
+
       setLog((prev) => [
         ...prev,
-        { type: "error", data: { message: err.message }, timestamp: Date.now() / 1000 },
+        {
+          type: "error",
+          data: {
+            message: parsed.message,
+            title: parsed.title,
+            raw: parsed.raw,
+            category: parsed.category,
+          },
+          timestamp: Date.now() / 1000,
+        },
       ]);
-      setStatus("error");
     } finally {
       setRunning(false);
     }
   };
 
   const clearLog = () => {
+    setErrorInfo(null);
     setLog([]);
     setStatus("idle");
     setTask("");
+    logger.debug("Dashboard", "Cleared execution log");
   };
 
   return (
@@ -157,11 +292,19 @@ export default function DashboardPage() {
           <div className={styles.header}>
             <div>
               <h1 className={styles.title}>Agent Dashboard</h1>
-              <p className={styles.subtitle}>Submit a natural language task and watch the agent execute it in real time.</p>
+              <p className={styles.subtitle}>
+                Submit a natural language task and watch the agent execute it in real time.
+              </p>
             </div>
             <div className={styles.statusPill} data-status={status}>
               <span className={styles.statusDot} />
-              {status === "idle" ? "Ready" : status === "running" ? "Running" : status === "done" ? "Complete" : "Error"}
+              {status === "idle"
+                ? "Ready"
+                : status === "running"
+                ? "Running"
+                : status === "done"
+                ? "Complete"
+                : "Error"}
             </div>
           </div>
 
@@ -184,7 +327,10 @@ export default function DashboardPage() {
                   <button
                     key={i}
                     className={`btn btn-ghost ${styles.presetBtn}`}
-                    onClick={() => setTask(pt)}
+                    onClick={() => {
+                      setTask(pt);
+                      setErrorInfo(null);
+                    }}
                     disabled={running}
                   >
                     Preset {i + 1}
@@ -206,6 +352,14 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
+
+          {errorInfo && (
+            <ErrorBanner
+              error={errorInfo}
+              onRetry={runTask}
+              onDismiss={() => setErrorInfo(null)}
+            />
+          )}
 
           <div className={styles.logPanel}>
             <div className={styles.logHeader}>
