@@ -1,0 +1,32 @@
+[
+  {
+    "id": "INV-2024-001",
+    "company": "Acme Corp",
+    "amount": 4250.0,
+    "due_date": "2024-11-15",
+    "status": "processed",
+    "description": "Software licensing Q4 2024",
+    "received_date": "2024-10-01",
+    "file": "acme_inv_001.pdf"
+  },
+  {
+    "id": "INV-2024-002",
+    "company": "TechFlow Ltd",
+    "amount": 8900.5,
+    "due_date": "2024-11-20",
+    "status": "processed",
+    "description": "Cloud infrastructure services October",
+    "received_date": "2024-10-03",
+    "file": "techflow_inv_002.pdf"
+  },
+  {
+    "id": "INV-2024-003",
+    "company": "BuildRight Inc",
+    "amount": 1350.0,
+    "due_date": "2024-10-30",
+    "status": "processed",
+    "description": "Office maintenance contract",
+    "received_date": "2024-10-02",
+    "file": "buildright_inv_003.pdf"
+  }
+]

@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.env
+.venv/
+venv/
+ENV/
+
+# Node / Next.js
+webapp/node_modules/
+webapp/.next/
+webapp/out/
+node_modules/
+.next/
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "ENTRY-0001",
+    "invoice_id": "INV-2024-003",
+    "company": "BuildRight Inc",
+    "amount": 1350.0,
+    "due_date": "2024-10-30",
+    "notes": "Office maintenance contract",
+    "recorded_at": "2026-10-03T21:26:53.292366",
+    "status": "recorded"
+  },
+  {
+    "id": "ENTRY-0002",
+    "invoice_id": "INV-2024-001",
+    "company": "Acme Corp",
+    "amount": 4250.0,
+    "due_date": "2024-11-15",
+    "notes": "Software licensing Q4 2024",
+    "recorded_at": "2026-10-03T21:31:13.195197",
+    "status": "recorded"
+  },
+  {
+    "id": "ENTRY-0003",
+    "invoice_id": "INV-2024-002",
+    "company": "TechFlow Ltd",
+    "amount": 8900.5,
+    "due_date": "2024-11-20",
+    "notes": "Cloud infrastructure services October. Pending invoice with earliest due date.",
+    "recorded_at": "2026-10-03T21:37:28.306343",
+    "status": "recorded"
+  },
+  {
+    "id": "ENTRY-0004",
+    "invoice_id": "INV-2024-001",
+    "company": "Acme Corp",
+    "amount": 4250.0,
+    "due_date": "2024-11-15",
+    "notes": "Software licensing Q4 2024",
+    "recorded_at": "2026-10-03T21:37:56.734643",
+    "status": "recorded"
+  },
+  {
+    "id": "ENTRY-0005",
+    "invoice_id": "INV-2024-001",
+    "company": "Acme Corp",
+    "amount": 4250.0,
+    "due_date": "2024-11-15",
+    "notes": "Software licensing Q4 2024",
+    "recorded_at": "2026-10-03T22:01:05.612128",
+    "status": "recorded"
+  }
+]

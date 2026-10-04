@@ -1,0 +1,133 @@
+.main { padding: 40px 0 80px; }
+
+.layout {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.appLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--warning);
+  margin-bottom: 6px;
+}
+
+.title { font-size: 22px; letter-spacing: -0.02em; margin-bottom: 4px; }
+.subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.success {
+  background: var(--success-dim);
+  border: 1px solid var(--success);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--success);
+}
+
+.error {
+  background: var(--error-dim);
+  border: 1px solid var(--error);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--error);
+}
+
+.entriesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.entriesTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.noEntries {
+  text-align: center;
+  padding: 32px 24px;
+}
+
+.noEntries p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.noEntries a {
+  color: var(--accent);
+}
+
+.entriesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.entryCard {
+  padding: 16px;
+}
+
+.entryTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.entryId {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.entryCompany {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.entryDetails {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  font-family: var(--mono);
+}
+
+.entryMeta {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.entryNotes {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}

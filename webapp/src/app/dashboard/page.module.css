@@ -1,0 +1,231 @@
+.main {
+  padding: 40px 0 80px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 16px;
+}
+
+.title {
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.statusPill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.statusPill[data-status="idle"] .statusDot { background: var(--text-dim); }
+.statusPill[data-status="running"] .statusDot { background: var(--accent); animation: pulse 1s infinite; }
+.statusPill[data-status="done"] .statusDot { background: var(--success); }
+.statusPill[data-status="error"] .statusDot { background: var(--error); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+/* Input section */
+.inputSection {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.taskInput {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  margin-bottom: 12px;
+  transition: border-color 0.15s;
+}
+
+.taskInput:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.taskInput:disabled { opacity: 0.5; }
+
+.inputActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.presets {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.presetBtn {
+  font-size: 11px;
+  padding: 4px 10px;
+}
+
+.actionBtns {
+  display: flex;
+  gap: 8px;
+}
+
+/* Log panel */
+.logPanel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.logHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.logTitle {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.logCount {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+}
+
+.logBody {
+  padding: 12px 0;
+  max-height: 480px;
+  overflow-y: auto;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.logEmpty {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--text-dim);
+  font-family: var(--font);
+  font-size: 13px;
+}
+
+.logEntry {
+  display: flex;
+  gap: 10px;
+  padding: 3px 16px;
+  line-height: 1.5;
+  align-items: flex-start;
+}
+
+.logEntry:hover {
+  background: var(--surface-2);
+}
+
+.logTime {
+  color: var(--text-dim);
+  flex-shrink: 0;
+  font-size: 11px;
+  margin-top: 1px;
+}
+
+.logType {
+  color: var(--text-dim);
+  flex-shrink: 0;
+  min-width: 120px;
+  font-size: 11px;
+  margin-top: 1px;
+}
+
+.logContent {
+  word-break: break-all;
+  flex: 1;
+}
+
+/* Log type colors */
+.logThinking { color: var(--text-muted); }
+.logTool { color: #60a5fa; }
+.logResultOk { color: #4ade80; }
+.logResultFail { color: var(--error); }
+.logResponse { color: var(--text); }
+.logError { color: var(--error); }
+.logComplete { color: #4ade80; }
+.logMuted { color: var(--text-dim); }
+
+.toolName {
+  color: #93c5fd;
+  font-weight: 500;
+}
+
+.toolArgs {
+  color: #a5b4fc;
+}
+
+.ok { color: #4ade80; font-weight: 600; }
+.fail { color: var(--error); font-weight: 600; }
+
+.finalResponse {
+  white-space: pre-wrap;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.successBanner {
+  background: var(--success-dim);
+  border: 1px solid var(--success);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--success);
+}
+
+.successBanner a {
+  color: var(--success);
+  font-weight: 600;
+  text-decoration: underline;
+}
